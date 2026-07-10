@@ -1,8 +1,9 @@
-import { generateCodeVerifier, generateState } from "arctic";
+import { generateState } from "arctic";
 import { github } from "../lib/oauth/github.js";
+import User from "../models/userSchema.js"
 
-export const getGithubLoginPage= async (req, res)=>{
-    if(req.user) return res.redirect("/");
+export const getGithubLoginPage=  (req, res)=>{
+   //  if(req.user) return res.redirect("/");
 
     const state = generateState();
     const url=github.createAuthorizationURL(state,["user:email"])
@@ -49,7 +50,13 @@ export const getGithubLoginCallback= async (req,res)=>{
 
    if(!githubUserResponse.ok) return handleFailedLogin();
    const githubUser=await githubUserResponse.json();
-   const {id:githubUserId,name}=githubUser;
+
+
+   
+   const {id:githubId,name,avatar_url:avatar}=githubUser;
+
+ 
+
 
    const githubEmailResponse=await fetch("https://api.github.com/user/emails",{
       headers:{
@@ -60,19 +67,40 @@ export const getGithubLoginCallback= async (req,res)=>{
    if(!githubEmailResponse.ok) return handleFailedLogin();
 
    const  emails = await githubEmailResponse.json();
-   const email = emails.filter((e)=>e.primary)[0].email;
 
-   if(!email) return handleFailedLogin();
+  const primaryEmail = emails.find(e => e.primary);
 
-   let user = await getUserWithOauthID({
-      provider:"github",
-      email,
+if (!primaryEmail) {
+    return handleFailedLogin();
+}
+
+const email = primaryEmail.email;
+
+   try {
+           const existingUser= await User.findOne({githubId});
+
+   if(existingUser){
+      return res.json({
+    success: true,
+    user: existingUser
+});
+   }
+
+        const data = {
+         githubId,
+         name,
+         email,
+         avatar
+      };
+      const setUser= new User(data);
+     const DBuser= await setUser.save();
+
+       res.json({
+      success:true,
+       user: DBuser
    })
-
-   if(user && !user.providerAccountId){
-      await linkUserWithOauth({
-         userId:user.id,
-         
-      })
+   } catch (error) {
+      console.log("we caught error ", error);
+      res.status(500).json({message:"We caught DB Error"})
    }
 }
