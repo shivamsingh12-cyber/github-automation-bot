@@ -55,7 +55,15 @@ export const getGithubLoginCallback= async (req,res)=>{
    
    const {id:githubId,name,avatar_url:avatar}=githubUser;
 
- 
+//  console.log(tokens.accessToken());
+
+    const cookieConfig={
+        httpOnly:true,
+        secure:false,
+        sameSite:"lax",
+     }
+
+ res.cookie("github_access_token",tokens.accessToken(),cookieConfig);
 
 
    const githubEmailResponse=await fetch("https://api.github.com/user/emails",{
