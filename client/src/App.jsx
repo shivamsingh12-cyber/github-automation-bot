@@ -1,10 +1,10 @@
-import User from "./showUser/User"
+import Repository from "./Repos/Repository"
 function App() {
 
 
   return (
     <>
-    <User/>
+    <Repository/>
     </>
   )
 }

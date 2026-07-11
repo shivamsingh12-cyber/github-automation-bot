@@ -85,25 +85,35 @@ if (!primaryEmail) {
 const email = primaryEmail.email;
 
    try {
+      console.log("Before finding user");
            const existingUser= await User.findOne({githubId});
 
    if(existingUser){
+      console.log("Existing User:", existingUser);
+        console.log("Inside existing user block");
+    console.log(existingUser._id);
+      res.cookie("app_user_id",String(existingUser._id),cookieConfig)
+          console.log("Cookie should be set now");
+
       return res.json({
     success: true,
     user: existingUser
-});
-   }
+   });
+}
 
-        const data = {
-         githubId,
-         name,
-         email,
-         avatar
-      };
-      const setUser= new User(data);
-     const DBuser= await setUser.save();
+const data = {
+   githubId,
+   name,
+   email,
+   avatar
+};
+const setUser= new User(data);
+const DBuser= await setUser.save();
+console.log("Inside new user block");
+res.cookie("app_user_id", String(DBuser._id), cookieConfig);
+console.log("Cookie should be set now");
 
-       res.json({
+      return res.json({
       success:true,
        user: DBuser
    })

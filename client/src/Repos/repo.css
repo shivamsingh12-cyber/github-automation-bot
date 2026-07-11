@@ -1,0 +1,58 @@
+.repo-page {
+	max-width: 900px;
+	margin: 40px auto;
+	padding: 0 16px;
+	font-family: Arial, sans-serif;
+}
+
+.repo-title {
+	margin-bottom: 20px;
+	font-size: 28px;
+	color: #1f2937;
+}
+
+.repo-list {
+	display: grid;
+	gap: 16px;
+}
+
+.repo-card {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	padding: 16px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.repo-card h2 {
+	margin: 0 0 8px;
+	font-size: 20px;
+	color: #111827;
+}
+
+.repo-card p {
+	margin: 0 0 12px;
+	color: #4b5563;
+}
+
+.repo-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	font-size: 14px;
+	color: #374151;
+}
+
+.connect-btn {
+	margin-top: 16px;
+	padding: 10px 14px;
+	border: none;
+	border-radius: 8px;
+	background: #111827;
+	color: #ffffff;
+	cursor: pointer;
+}
+
+.connect-btn:hover {
+	background: #1f2937;
+}
