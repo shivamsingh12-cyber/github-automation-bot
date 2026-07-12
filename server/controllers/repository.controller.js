@@ -1,5 +1,7 @@
 import Repository from "../models/repository.js";
 import User from "../models/userSchema.js";
+import Repo from "../models/repository.js";
+import { config } from "dotenv";
 
 export const getGithubRepositories=async  (req, res)=>{
     try {
@@ -52,14 +54,47 @@ export const saveGithubRepository=async  (req, res)=>{
 console.log(req.body);
         const userId = req.cookies.app_user_id
          if (!userId) return res.status(401).json({ message: "Not logged in" });
+
+        
+
   const user = await User.findById(userId);
+
+ 
+
   if (!user) return res.status(401).json({ message: "User not found" });
 
     const {repoId,repoName,fullName, owner, private:isPrivate}= req.body;
+
     const existingRepo= await Repository.findOne({userId,repoId});
-    if(existingRepo){
+       if(existingRepo){
         return res.status(409).json({message:"repository already connected"});
     }
+
+         const getToken=req.cookies.oauth_access_token;
+    const githubHook = await fetch(`https://api.github.com/repos/${owner}/${repoName}/hooks`,{
+        method:"POST",
+        headers:{
+            Authorization:`Bearer ${getToken}`,
+            Accept:"application/vnd.github+json",
+            "Content-Type":"application/json"
+        },
+          body: JSON.stringify({
+            name:"web",
+            active:true,
+            events:["issues","pull_request","push"],
+            config:{
+                url:"https://"
+            }
+        })
+    },
+      
+);
+
+        if (!githubHook) {
+            return  res.status(409).json({message:"err in creating webhook"});
+        }
+
+ 
         const repo=await Repository.create({
             userId,
             repoId,
@@ -82,6 +117,7 @@ export const getConnectedRepositories = async (req, res) => {
     const userId = req.cookies.app_user_id;
     if (!userId) return res.status(401).json({ message: "Not logged in" });
 
+  
     const repos = await Repository.find({ userId }).select("repoId");
     return res.json(repos);
   } catch (error) {

@@ -9,8 +9,12 @@ router.get("/",(req,res)=>{
     res.json('shivam')
 });
 
-router.get("/repositories",getGithubRepositories);
+// POST request
 router.post("/repositories/connect",saveGithubRepository);
+// router.post("/api/webhook",);
+
+// GET request
+router.get("/repositories",getGithubRepositories);
 router.get("/github",getGithubLoginPage);
 router.get("/repositories/connected", getConnectedRepositories);
 
