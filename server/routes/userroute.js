@@ -1,6 +1,7 @@
 import express from "express";
 import {getGithubLoginPage,getGithubLoginCallback} from "../controllers/auth.controller.js"
-import { getGithubRepositories,saveGithubRepository, getConnectedRepositories, githubWebhookHandler } from "../controllers/repository.controller.js"
+import {githubWebhookHandler} from "../controllers/webhook.controller.js"
+import { getGithubRepositories,saveGithubRepository, getConnectedRepositories} from "../controllers/repository.controller.js"
 import * as arctic from "arctic"
 
 const router=express.Router();

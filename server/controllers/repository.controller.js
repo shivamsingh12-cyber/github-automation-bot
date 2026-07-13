@@ -137,14 +137,3 @@ export const getConnectedRepositories = async (req, res) => {
   }
 };
 
-export const githubWebhookHandler = async (req,res) => {
-      console.log("Webhook hit!");
-      
-      console.log("Event:", req.headers["x-github-event"]);
-
-    console.log(req.body);
-
-   return res.status(200).json({
-    message:"Webhook received"
-});
-}

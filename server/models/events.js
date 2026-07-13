@@ -1,17 +1,30 @@
 import mongoose from "mongoose";
 
 
-const event = new mongoose.Schema({
-    type:String,
-    payload:String,
-    repo:String,
-    status:String,
-    createdAt:{
-        type:Date,
-        default:Date.now
+
+const eventSchema = new mongoose.Schema({
+     type: String,
+
+    action: String,
+
+    repository: String,
+
+    title: String,
+
+    payload: mongoose.Schema.Types.Mixed,
+
+    deliveryId: {
+    type: String,
+    unique: true
+},
+    status: String,
+
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
-const Event = mongoose.model('Events',event);
+const Event = mongoose.model('Event',eventSchema);
 
 export default Event;
