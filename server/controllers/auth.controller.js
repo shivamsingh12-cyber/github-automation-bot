@@ -6,7 +6,10 @@ export const getGithubLoginPage=  (req, res)=>{
    //  if(req.user) return res.redirect("/");
 
     const state = generateState();
-    const url=github.createAuthorizationURL(state,["user:email"])
+   const url = github.createAuthorizationURL(state, [
+    "repo",
+    "user:email"
+]);
 
      const cookieConfig={
         httpOnly:true,

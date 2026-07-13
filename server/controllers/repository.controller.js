@@ -1,7 +1,9 @@
 import Repository from "../models/repository.js";
 import User from "../models/userSchema.js";
 import Repo from "../models/repository.js";
-import { config } from "dotenv";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const getGithubRepositories=async  (req, res)=>{
     try {
@@ -70,7 +72,9 @@ console.log(req.body);
         return res.status(409).json({message:"repository already connected"});
     }
 
-         const getToken=req.cookies.oauth_access_token;
+         const getToken=req.cookies.github_access_token;
+
+         //  github hook
     const githubHook = await fetch(`https://api.github.com/repos/${owner}/${repoName}/hooks`,{
         method:"POST",
         headers:{
@@ -83,16 +87,24 @@ console.log(req.body);
             active:true,
             events:["issues","pull_request","push"],
             config:{
-                url:"https://"
+                url:"https://cab3-152-59-168-185.ngrok-free.app/api/webhook",
+                content_type:"json",
+                secret:process.env.GITHUB_WEBHOOK_SECRET
             }
         })
     },
       
 );
 
-        if (!githubHook) {
-            return  res.status(409).json({message:"err in creating webhook"});
-        }
+        console.log("GitHub Status:", githubHook.status);
+
+const githubData = await githubHook.json();
+
+console.log(githubData);
+
+if (!githubHook.ok) {
+    return res.status(githubHook.status).json(githubData);
+}
 
  
         const repo=await Repository.create({
@@ -124,3 +136,15 @@ export const getConnectedRepositories = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+export const githubWebhookHandler = async (req,res) => {
+      console.log("Webhook hit!");
+      
+      console.log("Event:", req.headers["x-github-event"]);
+
+    console.log(req.body);
+
+   return res.status(200).json({
+    message:"Webhook received"
+});
+}
