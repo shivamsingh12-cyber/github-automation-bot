@@ -9,15 +9,24 @@ const eventSchema = new mongoose.Schema({
 
     repository: String,
 
+    owner:String,
+
+    sender:String,
+
     title: String,
 
-    payload: mongoose.Schema.Types.Mixed,
-
-    deliveryId: {
+        deliveryId: {
     type: String,
     unique: true
 },
-    status: String,
+
+  status: {
+    type: String,
+    enum: ["pending", "completed", "failed"],
+    default: "pending"
+},
+
+    payload: mongoose.Schema.Types.Mixed,
 
     createdAt: {
         type: Date,

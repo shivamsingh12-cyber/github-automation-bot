@@ -44,10 +44,11 @@ export const getGithubLoginCallback= async (req,res)=>{
    } catch {
       return handleFailedLogin();
    }
+   const accessToken = tokens.accessToken();
 
    const githubUserResponse = await fetch(`https://api.github.com/user`,{
       headers:{
-         Authorization: `Bearer ${tokens.accessToken()}`,
+         Authorization: `Bearer ${accessToken}`,
       },
    });
 
@@ -56,7 +57,7 @@ export const getGithubLoginCallback= async (req,res)=>{
 
 
    
-   const {id:githubId,name,avatar_url:avatar}=githubUser;
+   const {id:githubId,name,avatar_url:avatar,login}=githubUser;
 
 //  console.log(tokens.accessToken());
 
@@ -66,12 +67,12 @@ export const getGithubLoginCallback= async (req,res)=>{
         sameSite:"lax",
      }
 
- res.cookie("github_access_token",tokens.accessToken(),cookieConfig);
+ res.cookie("github_access_token",accessToken,cookieConfig);
 
 
    const githubEmailResponse=await fetch("https://api.github.com/user/emails",{
       headers:{
-         Authorization: `Bearer ${tokens.accessToken()}`,
+         Authorization: `Bearer ${accessToken}`,
       },
    });
 
@@ -94,7 +95,15 @@ const email = primaryEmail.email;
    if(existingUser){
       console.log("Existing User:", existingUser);
         console.log("Inside existing user block");
-    console.log(existingUser._id);
+
+  existingUser.login = login;
+    existingUser.name = name;
+    existingUser.email = email;
+    existingUser.avatar = avatar;
+    existingUser.accessToken = accessToken;
+
+    await existingUser.save();
+
       res.cookie("app_user_id",String(existingUser._id),cookieConfig)
           console.log("Cookie should be set now");
 
@@ -104,11 +113,14 @@ const email = primaryEmail.email;
    });
 }
 
+
 const data = {
    githubId,
+   login,
    name,
    email,
-   avatar
+   avatar,
+   accessToken,
 };
 const setUser= new User(data);
 const DBuser= await setUser.save();
